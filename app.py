@@ -11,7 +11,7 @@ import tempfile
 
 # Set page config
 st.set_page_config(
-    page_title="AI Loan Advisor",
+    page_title="Loan Pilot",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="expanded"
