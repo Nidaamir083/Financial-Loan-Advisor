@@ -8,6 +8,9 @@ import faiss
 import os
 from PIL import Image
 import tempfile
+from PyPDF2 import PdfReader
+from pdfminer.high_level import extract_text
+from io import BytesIO
 
 # Set page config
 st.set_page_config(
@@ -71,6 +74,151 @@ def extract_text_from_image(image, lang='eng+urd'):
         return text
     except Exception as e:
         return f"OCR Failed: {e}"
+
+def extract_text_from_pdf(pdf_file):
+    """Extract text from PDF using PyPDF2 (faster but less accurate)"""
+    try:
+        pdf_reader = PdfReader(pdf_file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text() or ""  # Handle None returns
+        return text
+    except Exception as e:
+        st.error(f"PyPDF2 extraction failed: {e}")
+        return None
+
+def extract_text_from_pdf_miner(pdf_path):
+    """Extract text from PDF using pdfminer (slower but more accurate)"""
+    try:
+        return extract_text(pdf_path)
+    except Exception as e:
+        st.error(f"PDFMiner extraction failed: {e}")
+        return None
+
+def analyze_pdf_content(text):
+    """Analyze extracted text for key loan-related information"""
+    analysis = {
+        "keywords_found": [],
+        "potential_missing": []
+    }
+
+# List of important keywords to look for
+    important_keywords = [
+        "income", "salary", "employment", "credit score",
+        "debt", "loan amount", "property", "collateral",
+        "tax returns", "bank statements", "identification"
+    ]
+    
+    for keyword in important_keywords:
+        if keyword.lower() in text.lower():
+            analysis["keywords_found"].append(keyword)
+
+ # Check for common missing elements
+    common_missing = []
+    if "bank statements" not in analysis["keywords_found"]:
+        common_missing.append("bank statements")
+    if "tax returns" not in analysis["keywords_found"]:
+        common_missing.append("tax returns")
+    
+    analysis["potential_missing"] = common_missing
+    
+    return analysis
+def pdf_analysis_section():
+    st.header("📄 PDF Document Analysis")
+    
+    uploaded_file = st.file_uploader(
+        "Upload your loan application PDF", 
+        type=["pdf"],
+        help="Upload your completed loan application form or supporting documents"
+    )
+    
+    if uploaded_file is not None:
+        # Create two columns for layout
+        col1, col2 = st.columns([1, 2])
+        
+        with col1:
+            st.subheader("Document Preview")
+            # Show PDF metadata
+            try:
+                pdf_reader = PdfReader(uploaded_file)
+                st.write(f"**Pages:** {len(pdf_reader.pages)}")
+                if pdf_reader.metadata:
+                    st.write("**Metadata:**")
+                    st.json(pdf_reader.metadata)
+            except:
+                pass
+             PDF preview (first page)
+            try:
+                from pdf2image import convert_from_bytes
+                images = convert_from_bytes(uploaded_file.getvalue(), first_page=1, last_page=1)
+                st.image(images[0], caption="First page preview", use_column_width=True)
+            except Exception as e:
+                st.warning(f"Couldn't generate preview: {e}")
+        
+        with col2:
+            st.subheader("Document Analysis")
+
+# Create tabs for different analysis methods
+            tab1, tab2 = st.tabs(["Quick Analysis", "Detailed Analysis"])
+            
+            with tab1:
+                with st.spinner("Extracting text (fast method)..."):
+                    text = extract_text_from_pdf(uploaded_file)
+                
+                if text:
+                    st.success("Text extracted successfully!")
+                    with st.expander("View extracted text"):
+                        st.text(text[:2000] + "..." if len(text) > 2000 else text)
+
+# Basic analysis
+                    analysis = analyze_pdf_content(text)
+                    st.subheader("Key Information Found")
+                    if analysis["keywords_found"]:
+                        st.write(", ".join(analysis["keywords_found"]))
+                    else:
+                        st.warning("No key loan terms found in document")
+                    
+                    st.subheader("Potential Missing Information")
+                    if analysis["potential_missing"]:
+                        st.warning("The following items may be missing: " + ", ".join(analysis["potential_missing"]))
+                    else:
+                        st.success("All key loan application elements detected")
+
+with tab2:
+                # Save to temp file for pdfminer
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                    tmp_file.write(uploaded_file.getvalue())
+                    tmp_path = tmp_file.name
+                
+                with st.spinner("Extracting text (detailed method)..."):
+                    detailed_text = extract_text_from_pdf_miner(tmp_path)
+                    os.unlink(tmp_path)  # Clean up temp file
+                
+                if detailed_text:
+                    st.success("Detailed text extraction complete!")
+                    with st.expander("View detailed extracted text"):
+                        st.text(detailed_text[:2000] + "..." if len(detailed_text) > 2000 else detailed_text)
+                    
+                    # More detailed analysis could go here
+                    st.info("Detailed analysis would compare document content against loan requirements")
+
+        # Add a section for asking questions about the document
+        st.divider()
+        st.subheader("Ask About Your Document")
+        
+        doc_question = st.text_input(
+            "Ask specific questions about your uploaded document",
+            placeholder="What information is missing from my application?"
+        )
+        
+        if doc_question and st.button("Get Answer"):
+            # Combine document text with question for context
+            context = f"Document content:\n{text[:3000]}\n\nQuestion: {doc_question}"
+            response = generate_response(context)
+            
+            st.markdown("### Advisor Response")
+            st.markdown(response)
+
 
 # Response generation
 def generate_response(user_query, top_k=3):
@@ -181,8 +329,8 @@ def main():
     # Main content
     if app_mode == "Chat Advisor":
         chat_advisor()
-    else:
-        document_analysis()
+   elif app_mode == "Document Analysis":
+        pdf_analysis_section()  # Changed from document_analysis to pdf_analysis_section
 
 if __name__ == "__main__":
     main()
