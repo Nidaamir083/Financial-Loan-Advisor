@@ -52,7 +52,33 @@ knowledge_chunks = [
     {"text": "The debt-to-income ratio should typically be below 40% for loan approval.", "source": "eligibility"},
     {"text": "Prepayment penalties may apply if you pay off your loan early.", "source": "loan_terms"},
     {"text": "Fixed interest rates remain the same throughout the loan term.", "source": "interest_rates"},
-    {"text": "Variable interest rates may change based on market conditions.", "source": "interest_rates"}
+    {"text": "Variable interest rates may change based on market conditions.", "source": "interest_rates"},
+    {"text": "SME loans typically require a minimum business revenue of $100,000/year for eligibility.", "source": "sme_eligibility"},
+    {"text": "Startups may need to provide a 2-year projected financial statement instead of historical records.", "source": "sme_documentation"},
+    {"text": "Collateral for business loans can include commercial property, equipment, or inventory.", "source": "sme_collateral"},
+    {"text": "Banks may require a personal guarantee from business owners for SME loans.", "source": "sme_requirements"},
+    {"text": "Industry-specific risk assessments (e.g., hospitality vs. manufacturing) affect loan terms.", "source": "sme_risk"},
+    {"text": "Joint home loan applications can increase eligibility based on combined incomes.", "source": "home_loan_terms"},
+    {"text": "Home loans for properties under construction have staggered disbursement schedules.", "source": "home_loan_disbursement"},
+    {"text": "Government-backed loans (e.g., FHA, VA) may have lower down payment requirements.", "source": "government_loans"},
+    {"text": "Home loan EMI should not exceed 40% of your monthly income.", "source": "home_loan_eligibility"},
+    {"text": "Property insurance is mandatory for home loans in flood-prone areas.", "source": "home_loan_insurance},
+    {"text": "Late payments on existing loans can reduce your credit score by 50-100 points.", "source": "credit_impact"},
+    {"text": "A debt-to-income ratio above 50% usually leads to loan rejection.", "source", "risk_assessment"},
+    {"text": "Banks may offer lower interest rates to customers with long-term banking relationships.", "source": "loyalty_benefits"},
+    {"text": "Loan rejections within the last 6 months negatively impact future applications.", "source": "credit_history"},
+    {"text": "Credit score ranges: Poor (<580), Fair (580-669), Good (670-739), Excellent (740+).", "source", "credit_score_ranges"},
+    {"text": "Document processing times range from 3-7 business days for most loans.", "source": "processing_time"},
+    {"text": "Digital document submission can accelerate approval by 30%.", "source": "digital_process"},
+    {"text": "Notarized affidavits may be required for address verification.", "source": "documentation"},
+    {"text": "Loan sanction letters are valid for 3-6 months depending on the bank.", "source": "sanction_terms"},
+    {"text": "Physical signatures are still required for mortgage agreements in most countries.", "source": "legal_requirements"},
+    {"text": "Medical emergency loans may require hospital admission proof but have faster approval.", "source": "emergency_loans"},
+    {"text": "Green energy loans often come with 0.5-1% interest rate subsidies.", "source": "green_loans"},
+    {"text": "Loans for women entrepreneurs may have 10-20% lower interest rates.", "source": "gender_based_loans"},
+    {"text": "Agricultural loans may offer monsoon-season repayment holidays.", "source": "agricultural_loans"}
+
+}
 ]
 
 # Initialize models
@@ -176,12 +202,12 @@ def sidebar():
         """)
         
         st.markdown("---")
-        st.markdown("Made with ❤️ by [Your Name]")
+        st.markdown("Made by [Team]")
     
     return app_mode
 
 def chat_advisor():
-    st.header("💬 Chat with Loan Advisor")
+    st.header("💬 Chat with Loan Pilot")
     
     # Chat history
     for message in st.session_state.chat_history:
@@ -300,7 +326,7 @@ def pdf_analysis_section():
             context = f"Document content:\n{text[:3000]}\n\nQuestion: {doc_question}"
             response = generate_response(context)
             
-            st.markdown("### Advisor Response")
+            st.markdown("### Pilot Response")
             st.markdown(response)
 
 # Main App
@@ -309,7 +335,7 @@ def main():
     app_mode = sidebar()
     
     # Main content
-    if app_mode == "Chat Advisor":
+    if app_mode == "Loan Pilot":
         chat_advisor()
     elif app_mode == "Document Analysis":
         pdf_analysis_section()
