@@ -101,8 +101,8 @@ def analyze_pdf_content(text):
         "keywords_found": [],
         "potential_missing": []
     }
-
-# List of important keywords to look for
+    
+    # List of important keywords to look for
     important_keywords = [
         "income", "salary", "employment", "credit score",
         "debt", "loan amount", "property", "collateral",
@@ -112,8 +112,8 @@ def analyze_pdf_content(text):
     for keyword in important_keywords:
         if keyword.lower() in text.lower():
             analysis["keywords_found"].append(keyword)
-
- # Check for common missing elements
+    
+    # Check for common missing elements
     common_missing = []
     if "bank statements" not in analysis["keywords_found"]:
         common_missing.append("bank statements")
@@ -123,104 +123,7 @@ def analyze_pdf_content(text):
     analysis["potential_missing"] = common_missing
     
     return analysis
-def pdf_analysis_section():
-    st.header("📄 PDF Document Analysis")
-    
-    uploaded_file = st.file_uploader(
-        "Upload your loan application PDF", 
-        type=["pdf"],
-        help="Upload your completed loan application form or supporting documents"
-    )
-    
-    if uploaded_file is not None:
-        # Create two columns for layout
-        col1, col2 = st.columns([1, 2])
-        
-        with col1:
-            st.subheader("Document Preview")
-            # Show PDF metadata
-            try:
-                pdf_reader = PdfReader(uploaded_file)
-                st.write(f"**Pages:** {len(pdf_reader.pages)}")
-                if pdf_reader.metadata:
-                    st.write("**Metadata:**")
-                    st.json(pdf_reader.metadata)
-            except:
-                pass
-             PDF preview (first page)
-            try:
-                from pdf2image import convert_from_bytes
-                images = convert_from_bytes(uploaded_file.getvalue(), first_page=1, last_page=1)
-                st.image(images[0], caption="First page preview", use_column_width=True)
-            except Exception as e:
-                st.warning(f"Couldn't generate preview: {e}")
-        
-        with col2:
-            st.subheader("Document Analysis")
 
-# Create tabs for different analysis methods
-            tab1, tab2 = st.tabs(["Quick Analysis", "Detailed Analysis"])
-            
-            with tab1:
-                with st.spinner("Extracting text (fast method)..."):
-                    text = extract_text_from_pdf(uploaded_file)
-                
-                if text:
-                    st.success("Text extracted successfully!")
-                    with st.expander("View extracted text"):
-                        st.text(text[:2000] + "..." if len(text) > 2000 else text)
-
-# Basic analysis
-                    analysis = analyze_pdf_content(text)
-                    st.subheader("Key Information Found")
-                    if analysis["keywords_found"]:
-                        st.write(", ".join(analysis["keywords_found"]))
-                    else:
-                        st.warning("No key loan terms found in document")
-                    
-                    st.subheader("Potential Missing Information")
-                    if analysis["potential_missing"]:
-                        st.warning("The following items may be missing: " + ", ".join(analysis["potential_missing"]))
-                    else:
-                        st.success("All key loan application elements detected")
-
-with tab2:
-                # Save to temp file for pdfminer
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-                    tmp_file.write(uploaded_file.getvalue())
-                    tmp_path = tmp_file.name
-                
-                with st.spinner("Extracting text (detailed method)..."):
-                    detailed_text = extract_text_from_pdf_miner(tmp_path)
-                    os.unlink(tmp_path)  # Clean up temp file
-                
-                if detailed_text:
-                    st.success("Detailed text extraction complete!")
-                    with st.expander("View detailed extracted text"):
-                        st.text(detailed_text[:2000] + "..." if len(detailed_text) > 2000 else detailed_text)
-                    
-                    # More detailed analysis could go here
-                    st.info("Detailed analysis would compare document content against loan requirements")
-
-        # Add a section for asking questions about the document
-        st.divider()
-        st.subheader("Ask About Your Document")
-        
-        doc_question = st.text_input(
-            "Ask specific questions about your uploaded document",
-            placeholder="What information is missing from my application?"
-        )
-        
-        if doc_question and st.button("Get Answer"):
-            # Combine document text with question for context
-            context = f"Document content:\n{text[:3000]}\n\nQuestion: {doc_question}"
-            response = generate_response(context)
-            
-            st.markdown("### Advisor Response")
-            st.markdown(response)
-
-
-# Response generation
 def generate_response(user_query, top_k=3):
     query_embedding = embedder.encode([user_query])
     distances, indices = faiss_index.search(query_embedding, top_k)
@@ -287,39 +190,103 @@ def chat_advisor():
         with st.chat_message("assistant"):
             st.markdown(response)
 
-def document_analysis():
-    st.header("📄 Document Analysis")
+def pdf_analysis_section():
+    st.header("📄 PDF Document Analysis")
     
-    uploaded_file = st.file_uploader("Upload your loan document (PDF)", type=["pdf"])
+    uploaded_file = st.file_uploader(
+        "Upload your loan application PDF", 
+        type=["pdf"],
+        help="Upload your completed loan application form or supporting documents"
+    )
     
     if uploaded_file is not None:
-        # Save to temp file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
-            tmp_path = tmp_file.name
+        # Create two columns for layout
+        col1, col2 = st.columns([1, 2])
         
-        # Process document
-        with st.spinner("Processing document..."):
-            img = pdf_to_image(tmp_path)
-            if img:
-                st.image(img, caption="First page of your document", width=300)
-                ocr_text = extract_text_from_image(img)
+        with col1:
+            st.subheader("Document Preview")
+            
+            # Show PDF metadata
+            try:
+                pdf_reader = PdfReader(uploaded_file)
+                st.write(f"**Pages:** {len(pdf_reader.pages)}")
+                if pdf_reader.metadata:
+                    st.write("**Metadata:**")
+                    st.json(pdf_reader.metadata)
+            except:
+                pass
+            
+            # PDF preview (first page)
+            try:
+                from pdf2image import convert_from_bytes
+                images = convert_from_bytes(uploaded_file.getvalue(), first_page=1, last_page=1)
+                st.image(images[0], caption="First page preview", use_column_width=True)
+            except Exception as e:
+                st.warning(f"Couldn't generate preview: {e}")
+        
+        with col2:
+            st.subheader("Document Analysis")
+            
+            # Create tabs for different analysis methods
+            tab1, tab2 = st.tabs(["Quick Analysis", "Detailed Analysis"])
+            
+            with tab1:
+                with st.spinner("Extracting text (fast method)..."):
+                    text = extract_text_from_pdf(uploaded_file)
                 
-                with st.expander("View extracted text"):
-                    st.text(ocr_text[:1000] + "..." if len(ocr_text) > 1000 else ocr_text)
+                if text:
+                    st.success("Text extracted successfully!")
+                    with st.expander("View extracted text"):
+                        st.text(text[:2000] + "..." if len(text) > 2000 else text)
+                    
+                    # Basic analysis
+                    analysis = analyze_pdf_content(text)
+                    st.subheader("Key Information Found")
+                    if analysis["keywords_found"]:
+                        st.write(", ".join(analysis["keywords_found"]))
+                    else:
+                        st.warning("No key loan terms found in document")
+                    
+                    st.subheader("Potential Missing Information")
+                    if analysis["potential_missing"]:
+                        st.warning("The following items may be missing: " + ", ".join(analysis["potential_missing"]))
+                    else:
+                        st.success("All key loan application elements detected")
+            
+            with tab2:
+                # Save to temp file for pdfminer
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                    tmp_file.write(uploaded_file.getvalue())
+                    tmp_path = tmp_file.name
                 
-                # Clean up
-                os.unlink(tmp_path)
+                with st.spinner("Extracting text (detailed method)..."):
+                    detailed_text = extract_text_from_pdf_miner(tmp_path)
+                    os.unlink(tmp_path)  # Clean up temp file
                 
-                # Chat about document
-                st.subheader("Ask about your document")
-                
-                doc_prompt = st.text_input("Ask questions about your uploaded document")
-                if doc_prompt and st.button("Ask"):
-                    response = generate_response(doc_prompt)
-                    st.info(response)
-            else:
-                st.error("Failed to process the PDF file")
+                if detailed_text:
+                    st.success("Detailed text extraction complete!")
+                    with st.expander("View detailed extracted text"):
+                        st.text(detailed_text[:2000] + "..." if len(detailed_text) > 2000 else detailed_text)
+                    
+                    # More detailed analysis could go here
+                    st.info("Detailed analysis would compare document content against loan requirements")
+
+        # Add a section for asking questions about the document
+        st.divider()
+        st.subheader("Ask About Your Document")
+        
+        doc_question = st.text_input(
+            "Ask specific questions about your uploaded document",
+            placeholder="What information is missing from my application?"
+        )
+        
+        if doc_question and st.button("Get Answer"):
+            # Combine document text with question for context
+            context = f"Document content:\n{text[:3000]}\n\nQuestion: {doc_question}"
+            response = generate_response(context)
+            
+            st.markdown("### Advisor Response")
+            st.markdown(response)
 
 # Main App
 def main():
@@ -329,8 +296,23 @@ def main():
     # Main content
     if app_mode == "Chat Advisor":
         chat_advisor()
-   elif app_mode == "Document Analysis":
-        pdf_analysis_section()  # Changed from document_analysis to pdf_analysis_section
+    elif app_mode == "Document Analysis":
+        pdf_analysis_section()
 
 if __name__ == "__main__":
     main()
+
+   
+
+
+
+      
+
+
+
+   
+        
+       
+        
+      
+  
