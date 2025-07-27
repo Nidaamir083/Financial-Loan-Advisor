@@ -8,3 +8,7 @@ python-dotenv==1.0.1
 Pillow==10.3.0
 PyPDF2==3.0.1
 pdfminer.six==20221105
+markdown-it-py==2.2.0  # Pinned to avoid conflict
+mdurl==0.1.2
+pygments==2.19.2
+rich==14.1.0
