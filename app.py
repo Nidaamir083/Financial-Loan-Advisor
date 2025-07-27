@@ -1,3 +1,18 @@
+import sys
+import logging
+
+# Configure logging
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+try:
+    # All your existing imports here
+    import pytesseract
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+except ImportError as e:
+    logger.error(f"Import failed: {e}")
+    st.error(f"Required package failed to load: {e}")
+    
 import streamlit as st
 import cv2
 import numpy as np
