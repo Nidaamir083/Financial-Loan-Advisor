@@ -333,7 +333,15 @@ def main():
     app_mode = sidebar()
     
     # Main content
-    if app_mode == "Loan Pilot":
+# (Keep all your existing imports at the top - remove duplicates)
+# (Keep all your existing configuration and setup code)
+
+def main():
+    # Sidebar navigation
+    app_mode = sidebar()
+    
+    # Main content - FIXED THE MODE CHECK
+    if app_mode == "Chat Advisor":
         chat_advisor()
     elif app_mode == "Document Analysis":
         pdf_analysis_section()
