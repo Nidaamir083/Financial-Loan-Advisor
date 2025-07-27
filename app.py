@@ -77,8 +77,6 @@ knowledge_chunks = [
     {"text": "Green energy loans often come with 0.5-1% interest rate subsidies.", "source": "green_loans"},
     {"text": "Loans for women entrepreneurs may have 10-20% lower interest rates.", "source": "gender_based_loans"},
     {"text": "Agricultural loans may offer monsoon-season repayment holidays.", "source": "agricultural_loans"}
-
-}
 ]
 
 # Initialize models
