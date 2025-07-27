@@ -64,7 +64,7 @@ knowledge_chunks = [
     {"text": "Home loan EMI should not exceed 40% of your monthly income.", "source": "home_loan_eligibility"},
     {"text": "Property insurance is mandatory for home loans in flood-prone areas.", "source": "home_loan_insurance"},
     {"text": "Late payments on existing loans can reduce your credit score by 50-100 points.", "source": "credit_impact"},
-    {"text": "A debt-to-income ratio above 50% usually leads to loan rejection.", "source", "risk_assessment"},
+    {"text": "A debt-to-income ratio above 50% usually leads to loan rejection.", "source": "risk_assessment"},
     {"text": "Banks may offer lower interest rates to customers with long-term banking relationships.", "source": "loyalty_benefits"},
     {"text": "Loan rejections within the last 6 months negatively impact future applications.", "source": "credit_history"},
     {"text": "Credit score ranges: Poor (<580), Fair (580-669), Good (670-739), Excellent (740+).", "source", "credit_score_ranges"},
