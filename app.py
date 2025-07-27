@@ -67,7 +67,7 @@ knowledge_chunks = [
     {"text": "A debt-to-income ratio above 50% usually leads to loan rejection.", "source": "risk_assessment"},
     {"text": "Banks may offer lower interest rates to customers with long-term banking relationships.", "source": "loyalty_benefits"},
     {"text": "Loan rejections within the last 6 months negatively impact future applications.", "source": "credit_history"},
-    {"text": "Credit score ranges: Poor (<580), Fair (580-669), Good (670-739), Excellent (740+).", "source", "credit_score_ranges"},
+    {"text": "Credit score ranges: Poor (<580), Fair (580-669), Good (670-739), Excellent (740+).", "source": "credit_score_ranges"},
     {"text": "Document processing times range from 3-7 business days for most loans.", "source": "processing_time"},
     {"text": "Digital document submission can accelerate approval by 30%.", "source": "digital_process"},
     {"text": "Notarized affidavits may be required for address verification.", "source": "documentation"},
