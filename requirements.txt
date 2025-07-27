@@ -1,12 +1,13 @@
 streamlit==1.33.0
-pytesseract==0.3.10
-opencv-python-headless==4.9.0.80
-pdf2image==1.17.0
-sentence-transformers==2.2.2
-huggingface-hub==0.20.3
-faiss-cpu==1.7.4
-PyPDF2==3.0.1
-pdfminer.six==20221105
-Pillow==10.2.0
-python-dotenv==1.0.1
+pytesseract
+opencv-python-headless
+pdf2image
+sentence-transformers
+huggingface-hub
+faiss-cpu
+PyPDF2
+pdfminer.six
+Pillow
+python-dotenv
+
 
